@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bean:beans xmlns:bean="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd 
+		http://www.springframework.org/schema/security 
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<http auto-config="true">
+		<intercept-url pattern="/" access="permitAll"/>
+		<intercept-url pattern="/api/*" access="hasAuthority('ADMIN')"/>
+		<intercept-url pattern="/productos" access="hasAuthority('ADMIN')"/>
+		
+		<form-login login-page="/login"
+			authentication-failure-url="/error"
+			username-parameter="usr"
+			password-parameter="psw"
+			
+			/>
+		<access-denied-handler error-page="/nopermitido"/>	
+			
+		<csrf disabled="true"></csrf>
+		<logout logout-success-url="/login"/>
+			
+		
+	</http>
+			
+
+	 <authentication-manager>
+	 	<authentication-provider>
+	 		<password-encoder hash="bcrypt"/>
+	 		
+	 		<jdbc-user-service data-source-ref="ds" 
+	 			users-by-username-query="select username, password, 1 as enabled from users where username = ?"
+	 			authorities-by-username-query="select username, rol as authority from users where username = ?"
+	 		/>
+	 	</authentication-provider>
+	 </authentication-manager>
+		
+</bean:beans>
